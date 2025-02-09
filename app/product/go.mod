@@ -10,6 +10,7 @@ replace (
 require (
 	github.com/cloudwego/kitex v0.12.1
 	github.com/hltl/GoMall/rpc_gen v0.0.0-00010101000000-000000000000
+	github.com/joho/godotenv v1.5.1
 	github.com/kitex-contrib/obs-opentelemetry/logging/logrus v0.0.0-20241120035129-55da83caab1b
 	github.com/kr/pretty v0.3.1
 	github.com/redis/go-redis/v9 v9.7.0
