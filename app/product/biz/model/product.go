@@ -19,8 +19,8 @@ func (p Product) TableName() string {
 	return "product"
 }
 
-func GetProductById(ctx context.Context, db *gorm.DB, id int) (product Product, err error) {
-	err = db.WithContext(ctx).Model(&Product{}).Where(&Product{Model: gorm.Model{ID: uint(id)}}).First(&product).Error
+func GetProductById(ctx context.Context, db *gorm.DB, id uint) (product Product, err error) {
+	err = db.WithContext(ctx).Model(&Product{}).Where(&Product{Model: gorm.Model{ID: id}}).First(&product).Error
 	return
 }
 

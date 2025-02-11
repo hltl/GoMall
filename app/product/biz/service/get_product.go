@@ -22,7 +22,7 @@ func (s *GetProductService) Run(req *product.GetProductReq) (resp *product.GetPr
 	if req.Id == 0 {
 		return nil, kerrors.NewGRPCBizStatusError(200401, "product id is required")
 	}
-	p, err := model.GetProductById(s.ctx, mysql.DB, int(req.Id))
+	p, err := model.GetProductById(s.ctx, mysql.DB, uint(req.Id))
 	if err != nil {
 		return nil, err
 	}
