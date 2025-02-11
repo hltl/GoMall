@@ -7,7 +7,7 @@ import (
 )
 
 type Product struct {
-	Base
+	gorm.Model
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Picture     string     `json:"picture"`
@@ -20,7 +20,7 @@ func (p Product) TableName() string {
 }
 
 func GetProductById(ctx context.Context, db *gorm.DB, id int) (product Product, err error) {
-	err = db.WithContext(ctx).Model(&Product{}).Where(&Product{Base: Base{ID: id}}).First(&product).Error
+	err = db.WithContext(ctx).Model(&Product{}).Where(&Product{Model: gorm.Model{ID: uint(id)}}).First(&product).Error
 	return
 }
 

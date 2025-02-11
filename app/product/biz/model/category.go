@@ -7,7 +7,7 @@ import (
 )
 
 type Category struct {
-	Base
+	gorm.Model
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Products    []Product `json:"products" gorm:"many2many:product_category"`
