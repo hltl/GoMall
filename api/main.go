@@ -17,9 +17,11 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 
+	"github.com/google/uuid"
 	hertzlog "github.com/hertz-contrib/logger/logrus"
 	"github.com/hltl/GoMall/api/biz/database"
 	"github.com/hltl/GoMall/api/biz/proto/auth"
+	"github.com/hltl/GoMall/api/biz/registry"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -169,14 +171,46 @@ func main() {
 
 	// 添加HTTP服务启动日志
 	logrus.WithField("port", 8888).Info("启动HTTP服务")
-	h.Spin()
 
-	// 添加优雅关闭
+	// 创建服务注册中心客户端
+	etcdRegistry, err := registry.NewEtcdRegistry([]string{"localhost:2379"})
+	if err != nil {
+		logrus.WithError(err).Fatal("创建etcd注册中心客户端失败")
+	}
+	defer etcdRegistry.Close()
+
+	// 注册服务实例
+	serviceInstance := &registry.ServiceInstance{
+		ID:      uuid.New().String(),
+		Name:    "gomall-api",
+		Address: "localhost",
+		Port:    8888,
+		Metadata: map[string]string{
+			"version": "1.0",
+		},
+	}
+
+	if err := etcdRegistry.Register(context.Background(), serviceInstance); err != nil {
+		logrus.WithError(err).Fatal("服务注册失败")
+	}
+
+	// 启动HTTP服务
+	go h.Spin()
+
+	// 等待退出信号
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	// 关闭连接
+	// 优雅关闭时注销服务
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := etcdRegistry.Deregister(ctx, serviceInstance); err != nil {
+		logrus.WithError(err).Error("服务注销失败")
+	}
+
+	// 关闭其他连接
 	grpcServer.GracefulStop()
 	authClient.Close()
 	sqlDB, _ := db.DB()
