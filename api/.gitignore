@@ -36,4 +36,40 @@ _testmain.go
 dumped_hertz_remote_config.json
 *.pb.go
 bin/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Binaries
+bin/
+output/
+
+# Logs
+*.log
+
+# Environment files
+.env
+*.local.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# etcd data
+default.etcd/
+
+# Generated files
+*.pb.go
+dumped_hertz_remote_config.json
 		  

@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"os/signal"
@@ -20,6 +21,7 @@ import (
 	"github.com/google/uuid"
 	hertzlog "github.com/hertz-contrib/logger/logrus"
 	"github.com/hltl/GoMall/api/biz/database"
+	"github.com/hltl/GoMall/api/biz/middleware"
 	"github.com/hltl/GoMall/api/biz/proto/auth"
 	"github.com/hltl/GoMall/api/biz/registry"
 	"github.com/joho/godotenv"
@@ -135,31 +137,133 @@ func main() {
 		ctx.Next(c)
 	})
 
-	// 添加CORS中间件
+	// 添加安全响应头中间件
 	h.Use(func(c context.Context, ctx *app.RequestContext) {
-		ctx.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		ctx.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		ctx.Header("Access-Control-Allow-Credentials", "true")
+		// 添加安全响应头
+		ctx.Header("X-Content-Type-Options", "nosniff")
+		ctx.Header("X-Frame-Options", "DENY")
+		ctx.Header("X-XSS-Protection", "1; mode=block")
+		ctx.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		ctx.Header("Content-Security-Policy", "default-src 'self'")
+		ctx.Header("Referrer-Policy", "strict-origin-when-cross-origin")
 
+		ctx.Next(c)
+	})
+
+	// 修改 CORS 中间件
+	h.Use(func(c context.Context, ctx *app.RequestContext) {
+		// 获取请求的 Origin
+		origin := string(ctx.Request.Header.Get("Origin"))
+		if origin == "" {
+			origin = "*"
+		}
+
+		// 设置 CORS 头
+		ctx.Header("Access-Control-Allow-Origin", origin)
+		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+		ctx.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, X-CSRF-Token")
+		ctx.Header("Access-Control-Allow-Credentials", "true")
+		ctx.Header("Access-Control-Max-Age", "86400") // 24小时
+		ctx.Header("Vary", "Origin")                  // 添加 Vary 头，用于缓存控制
+
+		// 处理 OPTIONS 预检请求
 		if string(ctx.Method()) == "OPTIONS" {
-			ctx.AbortWithStatus(204)
+			logrus.WithFields(logrus.Fields{
+				"path":   string(ctx.Path()),
+				"method": "OPTIONS",
+				"origin": origin,
+			}).Debug("处理CORS预检请求")
+
+			ctx.Status(204)
+			ctx.Abort()
 			return
 		}
+
 		ctx.Next(c)
+	})
+
+	// 修改 NoRoute 处理，排除 OPTIONS 请求
+	h.NoRoute(func(c context.Context, ctx *app.RequestContext) {
+		// 如果是 OPTIONS 请求，不作为 404 处理
+		if string(ctx.Method()) == "OPTIONS" {
+			ctx.Next(c)
+			return
+		}
+
+		path := string(ctx.Request.URI().Path())
+		method := string(ctx.Request.Method())
+		logrus.WithFields(logrus.Fields{
+			"path":   path,
+			"method": method,
+		}).Warn("请求的路径不存在")
+
+		ctx.JSON(404, map[string]interface{}{
+			"code":    404,
+			"message": "请求的路径不存在",
+			"path":    path,
+			"method":  method,
+		})
+	})
+
+	// 添加全局错误处理
+	h.Use(func(c context.Context, ctx *app.RequestContext) {
+		defer func() {
+			if err := recover(); err != nil {
+				logrus.WithFields(logrus.Fields{
+					"error": err,
+					"path":  string(ctx.Request.URI().Path()),
+				}).Error("服务器内部错误")
+
+				ctx.JSON(500, map[string]interface{}{
+					"code":    500,
+					"message": "服务器内部错误",
+					"error":   fmt.Sprint(err),
+				})
+			}
+		}()
+		ctx.Next(c)
+	})
+
+	// 在其他路由注册之前添加
+	h.GET("/favicon.ico", func(c context.Context, ctx *app.RequestContext) {
+		logrus.Debug("请求favicon.ico")
+		ctx.Status(204) // No Content
 	})
 
 	// 注册公开路由（不需要认证）
 	h.POST("/register", router.UserHandlerRegister)
+	h.OPTIONS("/register", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Status(204)
+	})
+
 	h.POST("/login", router.UserHandlerLogin)
+	h.OPTIONS("/login", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Status(204)
+	})
+
 	h.GET("/health", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(200, map[string]string{"status": "ok"})
 	})
+	h.OPTIONS("/health", func(c context.Context, ctx *app.RequestContext) {
+		ctx.Status(204)
+	})
+
+	// 初始化Casbin中间件
+	casbinMiddleware, err := middleware.NewCasbinMiddleware(
+		"configs/rbac_model.conf",
+		"configs/rbac_policy.csv",
+	)
+	if err != nil {
+		logrus.WithError(err).Fatal("初始化Casbin中间件失败")
+	}
 
 	// 创建需要认证的路由组
 	privateGroup := h.Group("/api")
 	// 为私有路由组添加认证中间件
-	privateGroup.Use(router.AuthMiddleware(authClient))
+	privateGroup.Use(
+		router.AuthMiddleware(authClient),
+		casbinMiddleware.AuthorizeMiddleware(),
+	)
 
 	// 注册需要认证的路由
 	{

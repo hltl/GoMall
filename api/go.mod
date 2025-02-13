@@ -3,6 +3,7 @@ module github.com/hltl/GoMall/api
 go 1.23.5
 
 require (
+	github.com/casbin/casbin/v2 v2.85.0
 	github.com/cloudwego/hertz v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/hertz-contrib/logger/logrus v1.0.1
@@ -21,6 +22,7 @@ require (
 	github.com/bytedance/gopkg v0.1.0 // indirect
 	github.com/bytedance/sonic v1.12.0 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
+	github.com/casbin/govaluate v1.1.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/cloudwego/netpoll v0.6.4 // indirect
