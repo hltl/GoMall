@@ -1,0 +1,33 @@
+syntax="proto3";
+
+package user;
+
+option go_package="github.com/hltl/GoMall/biz/proto/user";
+
+service UserService {
+    rpc Register(RegisterReq) returns (RegisterResp) {}
+    rpc Login(LoginReq) returns (LoginResp) {}
+}
+
+message RegisterReq {
+    string email = 1;
+    string password = 2;
+    string confirm_password = 3;
+}
+
+message RegisterResp {
+    int32 user_id = 1;
+    string message = 2;
+    int32 code = 3;
+    string token = 4;
+}
+
+message LoginReq {
+    string email= 1;
+    string password = 2;
+}
+
+message LoginResp {
+    int32 user_id = 1;
+    string token = 2; // 确保已添加该字段
+}
