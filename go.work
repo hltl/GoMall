@@ -4,6 +4,7 @@ use (
 	./app/cart
 	./app/frontend
 	./app/order
+	./app/payment
 	./app/product
 	./rpc_gen
 )
