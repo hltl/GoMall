@@ -1,0 +1,31 @@
+{"level":"info","msg":"成功初始化文件日志","time":"2025-02-15T16:12:07+08:00"}
+{"level":"info","msg":"数据库连接成功","time":"2025-02-15T16:12:07+08:00"}
+{"level":"info","msg":"数据库表结构已更新","tables":["users"],"time":"2025-02-15T16:12:07+08:00"}
+{"level":"info","msg":"启动gRPC服务在端口50052","time":"2025-02-15T16:12:07+08:00"}
+{"level":"info","msg":"gRPC服务开始启动...","time":"2025-02-15T16:12:07+08:00"}
+{"level":"info","msg":"gRPC服务启动完成","time":"2025-02-15T16:12:08+08:00"}
+{"level":"info","msg":"认证客户端连接成功","time":"2025-02-15T16:12:08+08:00"}
+{"level":"info","msg":"认证服务健康检查通过","time":"2025-02-15T16:12:08+08:00"}
+{"level":"info","msg":"gRPC连接正常","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=GET    absolutePath=/favicon.ico              --\u003e handlerName=main.main.func7 (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=POST   absolutePath=/register                 --\u003e handlerName=github.com/hltl/GoMall/api/biz/router.UserHandlerRegister (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=OPTIONS absolutePath=/register                 --\u003e handlerName=main.main.func8 (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=POST   absolutePath=/login                    --\u003e handlerName=github.com/hltl/GoMall/api/biz/router.UserHandlerLogin (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=OPTIONS absolutePath=/login                    --\u003e handlerName=main.main.func9 (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=GET    absolutePath=/health                   --\u003e handlerName=main.main.func10 (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=OPTIONS absolutePath=/health                   --\u003e handlerName=main.main.func11 (num=6 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"HERTZ: Method=POST   absolutePath=/api/test                 --\u003e handlerName=main.main.func12 (num=8 handlers)","time":"2025-02-15T16:12:08+08:00"}
+{"level":"info","msg":"启动HTTP服务","port":8888,"time":"2025-02-15T16:12:08+08:00"}
+{"lease_id":7587884798300065028,"level":"debug","msg":"成功创建etcd租约","time":"2025-02-15T16:12:08+08:00"}
+{"level":"debug","msg":"成功设置etcd续租","time":"2025-02-15T16:12:08+08:00"}
+{"key":"/services/gomall-api/60f715ca-da97-401b-8435-9d922743f5f9","level":"debug","msg":"正在注册服务到etcd","time":"2025-02-15T16:12:08+08:00","value":"{\"id\":\"60f715ca-da97-401b-8435-9d922743f5f9\",\"name\":\"gomall-api\",\"address\":\"localhost\",\"port\":8888,\"metadata\":{\"version\":\"1.0\"}}"}
+{"address":"localhost","level":"info","msg":"服务实例注册成功","port":8888,"service_id":"60f715ca-da97-401b-8435-9d922743f5f9","service_name":"gomall-api","time":"2025-02-15T16:12:08+08:00"}
+{"level":"info","msg":"HERTZ: Using network library=netpoll","time":"2025-02-15T16:12:08+08:00"}
+{"lease_id":7587884798300065028,"level":"debug","msg":"成功续租服务实例","time":"2025-02-15T16:12:08+08:00","ttl":15}
+{"level":"info","msg":"HERTZ: HTTP server listening on address=[::]:8888","time":"2025-02-15T16:12:08+08:00"}
+{"lease_id":7587884798300065028,"level":"debug","msg":"成功续租服务实例","time":"2025-02-15T16:12:13+08:00","ttl":15}
+{"level":"info","msg":"服务注册监控已关闭","time":"2025-02-15T16:12:18+08:00"}
+{"level":"info","msg":"HERTZ: Received signal: interrupt\n","time":"2025-02-15T16:12:18+08:00"}
+{"level":"info","msg":"HERTZ: Begin graceful shutdown, wait at most num=5 seconds...","time":"2025-02-15T16:12:18+08:00"}
+{"level":"info","msg":"HERTZ: Execute OnShutdownHooks finish","time":"2025-02-15T16:12:18+08:00"}
+{"level":"info","msg":"服务实例注销成功","service_id":"60f715ca-da97-401b-8435-9d922743f5f9","service_name":"gomall-api","time":"2025-02-15T16:12:18+08:00"}
