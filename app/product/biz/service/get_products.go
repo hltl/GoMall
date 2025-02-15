@@ -24,7 +24,7 @@ func (s *GetProductsService) Run(req *product.GetProductsReq) (resp *product.Get
 	// Assume req.ProductIds contains the list of product IDs.
 	for _, id := range req.Ids {
 		p,err:= model.GetProductById(s.ctx,mysql.DB,uint(id))
-		if err!=nil{
+		if err!=nil || id == 0{
 			failedIds = append(failedIds, id)
 		}else{
 			products = append(products, &product.Product{
