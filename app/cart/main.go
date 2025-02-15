@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/hltl/GoMall/app/cart/biz/dal"
 	"github.com/hltl/GoMall/app/cart/conf"
+	"github.com/hltl/GoMall/app/cart/rpc"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/cart/cartservice"
 	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
@@ -20,6 +21,7 @@ import (
 func main() {
 	_ = godotenv.Load()
 	dal.Init()
+	rpc.InitClient()
 	opts := kitexInit()
 
 	svr := cartservice.NewServer(new(CartServiceImpl), opts...)

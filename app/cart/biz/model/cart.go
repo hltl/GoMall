@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Cart struct {
@@ -21,46 +22,39 @@ type Item struct {
 	Quantity  int
 }
 
-func AddItem(ctx context.Context, db *gorm.DB, userId uint, item Item) (err error) {
-	var c Cart
-	if err := db.WithContext(ctx).Model(&Cart{}).
-		Where(Cart{UserID: userId,ProductID: item.ProductId}).
-		First(&c).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			newCart := Cart{
-				UserID:    userId,
-				ProductID: item.ProductId,
-				Quantity:  item.Quantity,
-			}
-			return db.WithContext(ctx).Create(&newCart).Error
-		}
-		return err
-	}
-
-	c.Quantity += item.Quantity
-	c.Quantity = max(c.Quantity, 0)
-	return db.WithContext(ctx).Save(&c).Error
+func AddItem(ctx context.Context, db *gorm.DB, userId uint, item Item) error {
+	return db.WithContext(ctx).Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "user_id"},
+			{Name: "product_id"},
+		},
+		DoUpdates: clause.Assignments(map[string]interface{}{
+			"quantity": gorm.Expr("GREATEST(quantity + ?, 0)", item.Quantity),
+		}),
+	}).Create(&Cart{
+		UserID:    userId,
+		ProductID: item.ProductId,
+		Quantity:  item.Quantity,
+	}).Error
 }
-func EmptyCart(ctx context.Context, db *gorm.DB,userId uint)(err error){
+
+func EmptyCart(ctx context.Context, db *gorm.DB, userId uint) (err error) {
 	return db.WithContext(ctx).Where("user_id = ?", userId).Delete(&Cart{}).Error
 }
 
-func GetItemsByUserId(ctx context.Context, db *gorm.DB, userId uint)(items []*Item, err error){
-	var Carts []Cart
-	if err = db.WithContext(ctx).Where("user_id = ?", userId).Find(&Carts).Error; err != nil {
+func GetItemsByUserId(ctx context.Context, db *gorm.DB, userId uint) ([]*Item, error) {
+	var tmp []Item
+	if err := db.WithContext(ctx).
+		Model(&Cart{}).
+		Where("user_id = ?", userId).
+		Select("product_id, quantity").
+		Scan(&tmp).Error; err != nil {
 		return nil, err
 	}
 
-	items = make([]*Item, len(Carts))
-	for i, ci := range Carts {
-		items[i] = &Item{
-			ProductId: ci.ProductID,
-			Quantity:  ci.Quantity,
-		}
+	items := make([]*Item, len(tmp))
+	for i := range tmp {
+		items[i] = &tmp[i]
 	}
 	return items, nil
 }
-
-
-
-
