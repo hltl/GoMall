@@ -40,7 +40,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	if err != nil {
 		return nil, kerrors.NewGRPCBizStatusError(5005002, fmt.Sprintf("get products failed:%v", err))
 	}
-	if productsResp.Products != nil && len(productsResp.Products) > 0 {
+	if len(productsResp.Products) < len(cartResp.Cart.Items) {
 		return nil, kerrors.NewGRPCBizStatusError(50054002, "get products failed")
 	}
 	// 计算总价
