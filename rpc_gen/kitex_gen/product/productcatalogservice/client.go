@@ -13,6 +13,7 @@ import (
 type Client interface {
 	ListProducts(ctx context.Context, Req *product.ListProductsReq, callOptions ...callopt.Option) (r *product.ListProductsResp, err error)
 	GetProduct(ctx context.Context, Req *product.GetProductReq, callOptions ...callopt.Option) (r *product.GetProductResp, err error)
+	GetProducts(ctx context.Context, Req *product.GetProductsReq, callOptions ...callopt.Option) (r *product.GetProductsResp, err error)
 	SearchProducts(ctx context.Context, Req *product.SearchProductsReq, callOptions ...callopt.Option) (r *product.SearchProductsResp, err error)
 }
 
@@ -53,6 +54,11 @@ func (p *kProductCatalogServiceClient) ListProducts(ctx context.Context, Req *pr
 func (p *kProductCatalogServiceClient) GetProduct(ctx context.Context, Req *product.GetProductReq, callOptions ...callopt.Option) (r *product.GetProductResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetProduct(ctx, Req)
+}
+
+func (p *kProductCatalogServiceClient) GetProducts(ctx context.Context, Req *product.GetProductsReq, callOptions ...callopt.Option) (r *product.GetProductsResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetProducts(ctx, Req)
 }
 
 func (p *kProductCatalogServiceClient) SearchProducts(ctx context.Context, Req *product.SearchProductsReq, callOptions ...callopt.Option) (r *product.SearchProductsResp, err error) {

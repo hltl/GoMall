@@ -14,6 +14,7 @@ type RPCClient interface {
 	Service() string
 	ListProducts(ctx context.Context, Req *product.ListProductsReq, callOptions ...callopt.Option) (r *product.ListProductsResp, err error)
 	GetProduct(ctx context.Context, Req *product.GetProductReq, callOptions ...callopt.Option) (r *product.GetProductResp, err error)
+	GetProducts(ctx context.Context, Req *product.GetProductsReq, callOptions ...callopt.Option) (r *product.GetProductsResp, err error)
 	SearchProducts(ctx context.Context, Req *product.SearchProductsReq, callOptions ...callopt.Option) (r *product.SearchProductsResp, err error)
 }
 
@@ -49,6 +50,10 @@ func (c *clientImpl) ListProducts(ctx context.Context, Req *product.ListProducts
 
 func (c *clientImpl) GetProduct(ctx context.Context, Req *product.GetProductReq, callOptions ...callopt.Option) (r *product.GetProductResp, err error) {
 	return c.kitexClient.GetProduct(ctx, Req, callOptions...)
+}
+
+func (c *clientImpl) GetProducts(ctx context.Context, Req *product.GetProductsReq, callOptions ...callopt.Option) (r *product.GetProductsResp, err error) {
+	return c.kitexClient.GetProducts(ctx, Req, callOptions...)
 }
 
 func (c *clientImpl) SearchProducts(ctx context.Context, Req *product.SearchProductsReq, callOptions ...callopt.Option) (r *product.SearchProductsResp, err error) {
