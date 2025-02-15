@@ -18,7 +18,7 @@ var (
 	// PaymentServiceClient is a client for the PaymentService service
 	CartClient    cartservice.Client
 	ProductClient productcatalogservice.Client
-	PaymentClinet paymentservice.Client
+	PaymentClient paymentservice.Client
 	once          sync.Once
 	err           error
 )
@@ -42,7 +42,7 @@ func initCartClient() {
 		client.WithTransportProtocol((transport.GRPC)),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
 
-	CartClient,err=cartservice.NewClient("cart",opts...)
+	CartClient, err = cartservice.NewClient("cart", opts...)
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +59,7 @@ func initProductClient() {
 		client.WithTransportProtocol((transport.GRPC)),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
 
-	ProductClient,err=productcatalogservice.NewClient("product",opts...)
+	ProductClient, err = productcatalogservice.NewClient("product", opts...)
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +76,7 @@ func initPaymentClient() {
 		client.WithTransportProtocol((transport.GRPC)),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
 
-	PaymentClinet,err=paymentservice.NewClient("payment",opts...)
+	PaymentClient, err = paymentservice.NewClient("payment", opts...)
 	if err != nil {
 		panic(err)
 	}
