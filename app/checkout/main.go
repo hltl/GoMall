@@ -7,7 +7,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
-	"github.com/hltl/GoMall/app/cart/rpc"
+	"github.com/hltl/GoMall/app/checkout/rpc"
 	"github.com/hltl/GoMall/app/checkout/conf"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/checkout/checkoutservice"
 	"github.com/joho/godotenv"
