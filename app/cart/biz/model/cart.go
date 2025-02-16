@@ -8,9 +8,9 @@ import (
 )
 
 type Cart struct {
-	UserID    uint `json:"userId" gorm:"primaryKey"`
-	ProductID uint `json:"productId" gorm:"primaryKey"`
-	Quantity  int  `json:"quantity"`
+	UserID    uint32 `json:"userId" gorm:"primaryKey"`
+	ProductID uint32 `json:"productId" gorm:"primaryKey"`
+	Quantity  int32  `json:"quantity"`
 }
 
 func (c Cart) TableName() string {
@@ -18,11 +18,11 @@ func (c Cart) TableName() string {
 }
 
 type Item struct {
-	ProductId uint
-	Quantity  int
+	ProductId uint32
+	Quantity  int32
 }
 
-func AddItem(ctx context.Context, db *gorm.DB, userId uint, item Item) error {
+func AddItem(ctx context.Context, db *gorm.DB, userId uint32, item Item) error {
 	return db.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns: []clause.Column{
 			{Name: "user_id"},

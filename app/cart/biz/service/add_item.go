@@ -31,6 +31,6 @@ func (s *AddItemService) Run(req *cart.AddItemReq) (resp *cart.AddItemResp, err 
 	if req.UserId == 0 {
 		return nil, kerrors.NewGRPCBizStatusError(200401, "user id is required")
 	}
-	err = model.AddItem(s.ctx, mysql.DB, uint(req.UserId), model.Item{ProductId: uint(req.Item.ProductId), Quantity: int(req.Item.Quantity)})
+	err = model.AddItem(s.ctx, mysql.DB, req.UserId, model.Item{ProductId: req.Item.ProductId, Quantity: req.Item.Quantity})
 	return
 }
