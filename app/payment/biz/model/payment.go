@@ -20,6 +20,6 @@ func (PaymentLog) TableName() string {
 	return "payment_log"
 }
 
-func (pl *PaymentLog) Save(db *gorm.DB, ctx context.Context) error {
+func Pay(ctx context.Context, db *gorm.DB,pl *PaymentLog) error {
 	return db.WithContext(ctx).Model(&PaymentLog{}).Create(pl).Error
 }

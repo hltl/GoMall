@@ -11,6 +11,7 @@ import (
 	"github.com/hltl/GoMall/app/payment/biz/dal/mysql"
 	"github.com/hltl/GoMall/app/payment/biz/model"
 	payment "github.com/hltl/GoMall/rpc_gen/kitex_gen/payment"
+	"gorm.io/gorm"
 )
 
 type ChargeService struct {
@@ -38,15 +39,21 @@ func (s *ChargeService) Run(req *payment.ChargeReq) (resp *payment.ChargeResp, e
 	if err != nil {
 		return nil, kerrors.NewGRPCBizStatusError(4005001, err.Error())
 	}
-	pl := &model.PaymentLog{
-		UserID:        uint(req.UserId),
-		OrderId:       req.OrderId,
-		TransactionID: tId.String(),
-		Amount:        req.Amount,
-		PayAt:         time.Now(),
-	}
-	if err = pl.Save(mysql.DB, s.ctx); err != nil {
-		return nil, kerrors.NewGRPCBizStatusError(4005002, err.Error())
+	err = mysql.DB.WithContext(s.ctx).Transaction(func(tx *gorm.DB) error {
+		pl := &model.PaymentLog{
+			UserID:        uint(req.UserId),
+			OrderId:       req.OrderId,
+			TransactionID: tId.String(),
+			Amount:        req.Amount,
+			PayAt:         time.Now(),
+		}
+		if err := model.Pay(s.ctx, tx, pl); err != nil {
+			return kerrors.NewGRPCBizStatusError(4005002, err.Error())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return &payment.ChargeResp{TransactionId: tId.String()}, nil
