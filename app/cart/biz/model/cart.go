@@ -38,7 +38,7 @@ func AddItem(ctx context.Context, db *gorm.DB, userId uint32, item Item) error {
 	}).Error
 }
 
-func EmptyCart(ctx context.Context, db *gorm.DB, userId uint) (err error) {
+func EmptyCart(ctx context.Context, db *gorm.DB, userId uint32) (err error) {
 	return db.WithContext(ctx).Where("user_id = ?", userId).Delete(&Cart{}).Error
 }
 

@@ -21,6 +21,6 @@ func (s *EmptyCartService) Run(req *cart.EmptyCartReq) (resp *cart.EmptyCartResp
 	if req.UserId ==0{
 		return 
 	}
-	err=model.EmptyCart(s.ctx,mysql.DB,uint(req.UserId))
+	err=model.EmptyCart(s.ctx,mysql.DB,req.UserId)
 	return
 }
