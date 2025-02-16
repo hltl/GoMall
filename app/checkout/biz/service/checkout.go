@@ -6,10 +6,10 @@ import (
 
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/google/uuid"
 	"github.com/hltl/GoMall/app/checkout/rpc"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/cart"
 	checkout "github.com/hltl/GoMall/rpc_gen/kitex_gen/checkout"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/order"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/payment"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/product"
 )
@@ -43,21 +43,39 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 	if len(productsResp.Products) < len(cartResp.Cart.Items) {
 		return nil, kerrors.NewGRPCBizStatusError(50054002, "get products failed")
 	}
-	// 计算总价
+	// 计算总价,生成订单条目
 	price := make(map[uint32]float32, len(productsResp.Products))
 	for _, p := range productsResp.Products {
 		price[p.Id] = p.Price
 	}
 	var total float32
+	orderItem := make([]*order.OrderItem, len(productsResp.Products))
 	for _, item := range cartResp.Cart.Items {
-		total += price[item.ProductId] * float32(item.Quantity)
+		cost := price[item.ProductId] * float32(item.Quantity)
+		total += cost
+		orderItem = append(orderItem, &order.OrderItem{Item: item, Cost: cost})
 	}
 
 	// 创建订单
 	var orderId string
-	u, _ := uuid.NewRandom()
-	orderId = u.String()
-
+	orderReq := &order.PlaceOrderReq{
+		UserId:       req.UserId,
+		UserCurrency: "USD", // 简化处理，实际应该根据用户信息获取
+		Email:        req.Email,
+		Address: &order.Address{
+			StreetAddress: req.Address.StreetAddress,
+			City:          req.Address.City,
+			State:         req.Address.State,
+			Country:       req.Address.Country,
+			ZipCode:       req.Address.ZipCode,
+		},
+		OrderItems: orderItem,
+	}
+	orderResp, err := rpc.OrderClient.PlaceOrder(s.ctx, orderReq)
+	if err != nil {
+		return nil, err
+	}
+	orderId = orderResp.Order.OrderId
 	payReq := &payment.ChargeReq{
 		OrderId: orderId,
 		UserId:  req.UserId,
@@ -70,12 +88,19 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		},
 	}
 
+	// 交易支付
+
 	payResp, err := rpc.PaymentClient.Charge(s.ctx, payReq)
 	if err != nil {
 		return nil, kerrors.NewGRPCBizStatusError(5005003, fmt.Sprintf("payment failed:%v", err))
 	}
+	if _, err = rpc.OrderClient.MarkOrderPaid(s.ctx, &order.MarkOrderPaidReq{UserId: req.UserId, OrderId: orderId}); err != nil {
+		klog.Error("mark order failed:%v",err)
+		// todo 数据不一致
+	}
+
 	klog.Info(payResp)
-	_,err = rpc.CartClient.EmptyCart(s.ctx,&cart.EmptyCartReq{UserId: req.UserId})
+	_, err = rpc.CartClient.EmptyCart(s.ctx, &cart.EmptyCartReq{UserId: req.UserId})
 	if err != nil {
 		klog.Error("empty cart failed:%v", err)
 	}
