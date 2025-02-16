@@ -9,7 +9,6 @@ import (
 	"github.com/hltl/GoMall/app/cart/rpc"
 	cart "github.com/hltl/GoMall/rpc_gen/kitex_gen/cart"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/product"
-	"gorm.io/gorm"
 )
 
 type AddItemService struct {
@@ -32,11 +31,6 @@ func (s *AddItemService) Run(req *cart.AddItemReq) (resp *cart.AddItemResp, err 
 	if req.UserId == 0 {
 		return nil, kerrors.NewGRPCBizStatusError(200401, "user id is required")
 	}
-	err = mysql.DB.WithContext(s.ctx).Transaction(func(tx *gorm.DB) error {
-        return model.AddItem(s.ctx, tx, req.UserId, model.Item{ProductId: req.Item.ProductId, Quantity: req.Item.Quantity})
-    })
-	if err != nil {
-		return nil, err
-	}
+	err = model.AddItem(s.ctx, mysql.DB, req.UserId, model.Item{ProductId: req.Item.ProductId, Quantity: req.Item.Quantity})
 	return
 }
