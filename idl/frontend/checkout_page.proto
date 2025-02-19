@@ -3,7 +3,7 @@ syntax = "proto3";
 package frontend.checkout;
 
 import "api.proto";
-// import "frontend/common.proto";
+import "frontend/common.proto";
 
 option go_package = "/frontend/checkout";
 
@@ -23,12 +23,9 @@ message CheckoutReq {
   string payment = 13 [ (api.form) = "payment" ];
 }
 
-message Empty {
-  
-}
 
 service CheckoutService {
-  rpc Checkout(CheckoutReq) returns (Empty) {
+  rpc Checkout(CheckoutReq) returns (common.Empty) {
     option (api.get) = "/checkout";
   }
   // rpc CheckoutWaiting(common.Empty) returns (common.Empty) {
