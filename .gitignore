@@ -6,3 +6,4 @@ app/**/kitex_gen/
 
 go.work.sum
 api/default.etcd/
+*etcd*
