@@ -38,6 +38,12 @@ func main() {
 
 	router.GeneratedRegister(h)
 	h.LoadHTMLGlob("template/*")
+	h.Static("/static","./")
+
+	h.GET("/sign-in", func(c context.Context, ctx *app.RequestContext) {
+		ctx.HTML(consts.StatusOK, "sign-in.tmpl", nil)
+	})
+
 	h.Spin()
 }
 

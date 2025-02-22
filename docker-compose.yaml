@@ -15,3 +15,9 @@ services:
     image: 'hashicorp/consul'
     ports:
       - 8500:8500
+  ngrok:
+    image: 'ngrok/ngrok:latest'
+    environment:
+      - NGROK_AUTHTOKEN=2tMGLn6nqwA8c8XpDZySG1UFFHw_7chsKwPi3S4ZC1J4r8SEX
+    command: http 8080 --url=adjusted-bonefish-mildly.ngrok-free.app
+    network_mode: "host"
