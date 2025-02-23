@@ -28,9 +28,9 @@ func main() {
 	// dal.Init()
 	address := conf.GetConf().Hertz.Address
 	h := server.New(server.WithHostPorts(address))
-	
+
 	registerMiddleware(h)
-	
+
 	// add a ping route to test
 	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
@@ -38,12 +38,14 @@ func main() {
 
 	router.GeneratedRegister(h)
 	h.LoadHTMLGlob("template/*")
-	h.Static("/static","./")
+	h.Static("/static", "./")
 
 	h.GET("/sign-in", func(c context.Context, ctx *app.RequestContext) {
 		ctx.HTML(consts.StatusOK, "sign-in.tmpl", nil)
 	})
-
+	h.GET("/sign-up", func(c context.Context, ctx *app.RequestContext) {
+		ctx.HTML(consts.StatusOK, "sign-up.tmpl", nil)
+	})
 	h.Spin()
 }
 
