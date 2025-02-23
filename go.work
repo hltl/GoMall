@@ -8,5 +8,6 @@ use (
 	./app/order
 	./app/payment
 	./app/product
+	./app/user
 	./rpc_gen
 )
