@@ -2,9 +2,9 @@ package auth
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hltl/GoMall/gomall/app/frontend/biz/service"
 	"github.com/hltl/GoMall/gomall/app/frontend/biz/utils"
@@ -25,10 +25,8 @@ func Login(ctx context.Context, c *app.RequestContext) {
 
 	redirect, err := service.NewLoginService(ctx, c).Run(&req)
 	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
-		return
+		hlog.CtxErrorf(ctx, "login error: %v", err)
 	}
-	fmt.Println("redirect", redirect)
 	c.Redirect(consts.StatusOK, []byte(redirect))
 }
 

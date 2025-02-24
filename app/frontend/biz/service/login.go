@@ -27,11 +27,16 @@ func (h *LoginService) Run(req *auth.LoginRequest) (redirect string, err error) 
 	}()
 	// todo edit your code
 	resp, err := rpc.UserClient.Login(h.Context, &user.LoginReq{Email: req.Email, Password: req.Password})
+	if err != nil {
+		redirect = "/sign-in"
+		return
+	}
 	session := sessions.Default(h.RequestContext)
 	session.Set("user_id", resp.UserId)
 	err = session.Save()
 	if err != nil {
-		return "/sign-in", err
+		redirect = "/sign-in"
+		return
 	}
 	if req.Next != "" {
 		redirect = req.Next
