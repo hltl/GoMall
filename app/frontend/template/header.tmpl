@@ -6,10 +6,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet"
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" data-no-sourcemap
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://kit.fontawesome.com/0701914090.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/0701914090.js" data-no-sourcemap crossorigin="anonymous"></script>
 </head>
+
+<script>
+    async function handleLogout() {
+        try {
+            // 调用后端登出接口
+            const response = await fetch('/auth/logout', {
+                method: 'POST',
+                credentials: 'same-origin' // 确保发送 cookies
+            });
+
+            if (response.ok) {
+                // 清除前端缓存/状态
+                localStorage.clear();
+                sessionStorage.clear();
+
+                // 重定向到登录页
+                window.location.href = '/sign-in';
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+</script>
 
 <body class="min-vh-100">
     <header>
@@ -29,7 +54,7 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">{{$.Title}}</a>
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
                             </li>
 
                             <li class="nav-item dropdown">
@@ -43,7 +68,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link about">about</a>
+                                <a class="nav-link about" href="/about">about</a>
                             </li>
 
                         </ul>
@@ -58,14 +83,14 @@
                             <li class="nav-item mt-2">
                                 <i class="fa-solid fa-cart-shopping fa-xl"></i>
                             </li>
-                            {{if .User}}
+                            {{if .user_id}}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
                                     <i class="fa-solid fa-user fa-xl"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#">log out</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="handleLogout()">log out</a></li>
                                 </ul>
                             </li>
                             {{else}}

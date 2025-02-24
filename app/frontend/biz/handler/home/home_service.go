@@ -26,6 +26,6 @@ func Home(ctx context.Context, c *app.RequestContext) {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
-	c.HTML(consts.StatusOK,"home.tmpl",utils.WrapResponse(ctx,c,resp))
+	c.HTML(consts.StatusOK, "home.tmpl", utils.WrapResponse(ctx, c, resp))
 	// utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
 }

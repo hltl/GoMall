@@ -17,8 +17,12 @@ import (
 	"github.com/hertz-contrib/logger/accesslog"
 	hertzlogrus "github.com/hertz-contrib/logger/logrus"
 	"github.com/hertz-contrib/pprof"
+	"github.com/hertz-contrib/sessions"
+	"github.com/hertz-contrib/sessions/cookie"
 	"github.com/hltl/GoMall/gomall/app/frontend/biz/router"
 	"github.com/hltl/GoMall/gomall/app/frontend/conf"
+	"github.com/hltl/GoMall/gomall/app/frontend/infra/rpc"
+	"github.com/hltl/GoMall/gomall/app/frontend/middleware"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -26,9 +30,11 @@ import (
 func main() {
 	// init dal
 	// dal.Init()
+	rpc.InitClient()
 	address := conf.GetConf().Hertz.Address
 	h := server.New(server.WithHostPorts(address))
-
+	store := cookie.NewStore([]byte("secret"))
+	h.Use(sessions.New("mysession", store))
 	registerMiddleware(h)
 
 	// add a ping route to test
@@ -40,11 +46,15 @@ func main() {
 	h.LoadHTMLGlob("template/*")
 	h.Static("/static", "./")
 
+	h.GET("/about", func(c context.Context, ctx *app.RequestContext) {
+		ctx.HTML(consts.StatusOK, "about.tmpl", utils.H{"Title": "About"})
+	})
 	h.GET("/sign-in", func(c context.Context, ctx *app.RequestContext) {
-		ctx.HTML(consts.StatusOK, "sign-in.tmpl", nil)
+		data:=utils.H{"Title": "Sign In","Next":ctx.Query("next")}
+		ctx.HTML(consts.StatusOK, "sign-in.tmpl", data)
 	})
 	h.GET("/sign-up", func(c context.Context, ctx *app.RequestContext) {
-		ctx.HTML(consts.StatusOK, "sign-up.tmpl", nil)
+		ctx.HTML(consts.StatusOK, "sign-up.tmpl", utils.H{"Title": "Sign Up"})
 	})
 	h.Spin()
 }
@@ -88,4 +98,6 @@ func registerMiddleware(h *server.Hertz) {
 
 	// cores
 	h.Use(cors.Default())
+
+	middleware.Register(h)
 }

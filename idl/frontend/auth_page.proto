@@ -8,6 +8,7 @@ option go_package = "/frontend/auth";
 message LoginRequest {
     string email = 1[(api.form)="email"];
     string password = 2 [ (api.form) = "password" ];
+    string next = 3 [ (api.query) = "next" ];
 }
 
 message RegisterRequest {
@@ -22,6 +23,9 @@ service AuthService {
     }
     rpc Register(RegisterRequest) returns (common.Empty) {
         option (api.post) = "/auth/register";
+    }
+    rpc Logout(common.Empty) returns (common.Empty) {
+        option (api.post) = "/auth/logout";
     }
 }
 

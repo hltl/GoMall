@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/hltl/GoMall/app/user/biz/cache"
 	"github.com/hltl/GoMall/app/user/biz/dal/mysql"
 	"github.com/hltl/GoMall/app/user/biz/model"
-	"github.com/hltl/GoMall/app/user/model"
 	"github.com/hltl/GoMall/app/user/utils"
 	user "github.com/hltl/GoMall/rpc_gen/kitex_gen/user"
 	"golang.org/x/crypto/bcrypt"
@@ -26,7 +27,7 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 			Code:    1,
 			Message: "两次密码输入不一致",
 		}
-		return
+		return resp,kerrors.NewGRPCBizStatusError(1004001,"两次密码输入不一致")
 	}
 	// 校验邮箱
 	if !utils.CheckEmail(req.Email) {
@@ -34,15 +35,7 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 			Code:    1,
 			Message: "邮箱格式不正确",
 		}
-		return
-	}
-	// 校验密码
-	if !utils.CheckPassword(req.Password) {
-		resp = &user.RegisterResp{
-			Code:    1,
-			Message: "密码格式不正确",
-		}
-		return
+		return resp,kerrors.NewGRPCBizStatusError(1004001,"邮箱格式不正确")
 	}
 	// 检查邮箱是否已经注册
 	if _,err =model.GetUserByEmail(s.ctx,mysql.DB,req.Email); err == nil {
@@ -50,7 +43,7 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 			Code:    1,
 			Message: "邮箱已注册",
 		}
-		return
+		return resp,kerrors.NewGRPCBizStatusError(1004001,"邮箱已注册")
 	}
 	// 密码加密
 	passwardHashed,err:=bcrypt.GenerateFromPassword([]byte(req.Password),bcrypt.DefaultCost)
@@ -59,7 +52,7 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 			Code:    1,
 			Message: "密码加密失败",
 		}
-		return
+		return resp,kerrors.NewGRPCBizStatusError(1005001,"密码加密失败")
 	}
 	u := &model.User{
 		Email:    req.Email,
@@ -70,12 +63,22 @@ func (s *RegisterService) Run(req *user.RegisterReq) (resp *user.RegisterResp, e
 			Code:1,
 			Message:"注册失败",
 		}
-		return
+		return resp,kerrors.NewGRPCBizStatusError(1005001,"注册失败")
+	}
+	tok,err:=utils.GenerateToken(u.ID,req.Email)
+	if err!=nil{
+		resp = &user.RegisterResp{
+			Code:    1,
+			Message: "生成token失败",
+		}
+		return resp,kerrors.NewGRPCBizStatusError(1005001,"生成token失败")
 	}
 	resp = &user.RegisterResp{
+		UserId: int32(u.ID),
 		Code:    0,
 		Message: "注册成功",
-		Token:,
+		Token:tok,
 	}
-
+	err=cache.SetUserToken(s.ctx,u.ID,tok)
+	return
 }

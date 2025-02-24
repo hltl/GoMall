@@ -18,7 +18,7 @@ func (u *User) TableName() string {
 
 func GetUserByEmail(ctx context.Context,db *gorm.DB, email string) (*User, error) {
 	user := &User{}
-	if err := db.Where("email = ?", email).First(user).Error; err != nil {
+	if err := db.WithContext(ctx).Model(&User{}).Where("email = ?", email).First(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

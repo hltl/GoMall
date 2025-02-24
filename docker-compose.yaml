@@ -7,10 +7,10 @@ services:
     environment:
       - MYSQL_DATABASE=product
       - MYSQL_ROOT_PASSWORD=root
-  # redis:
-  #   image: 'redis:latest'
-  #   ports:
-  #     - 6379:6379
+  redis:
+    image: 'redis:latest'
+    ports:
+      - 6379:6379
   consul:
     image: 'hashicorp/consul'
     ports:

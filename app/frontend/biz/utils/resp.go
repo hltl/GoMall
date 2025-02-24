@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hltl/GoMall/gomall/app/frontend/middleware"
 )
 
 // SendErrResponse  pack error response
@@ -19,6 +20,6 @@ func SendSuccessResponse(ctx context.Context, c *app.RequestContext, code int, d
 }
 
 func WrapResponse(ctx context.Context,c *app.RequestContext,content map[string]any) map[string]any {
-	content["User"] = "test"
+	content["user_id"] = ctx.Value(middleware.SessionUserId)
 	return content
 }

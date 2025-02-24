@@ -5,8 +5,10 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/hertz-contrib/sessions"
 	auth "github.com/hltl/GoMall/gomall/app/frontend/hertz_gen/frontend/auth"
-	common "github.com/hltl/GoMall/gomall/app/frontend/hertz_gen/frontend/common"
+	"github.com/hltl/GoMall/gomall/app/frontend/infra/rpc"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/user"
 )
 
 type LoginService struct {
@@ -18,11 +20,24 @@ func NewLoginService(Context context.Context, RequestContext *app.RequestContext
 	return &LoginService{RequestContext: RequestContext, Context: Context}
 }
 
-func (h *LoginService) Run(req *auth.LoginRequest) (resp *common.Empty, err error) {
+func (h *LoginService) Run(req *auth.LoginRequest) (redirect string, err error) {
 	defer func() {
-	hlog.CtxInfof(h.Context, "req = %+v", req)
-	hlog.CtxInfof(h.Context, "resp = %+v", resp)
+		hlog.CtxInfof(h.Context, "req = %+v", req)
+		hlog.CtxInfof(h.Context, "redirect = %+v", redirect)
 	}()
 	// todo edit your code
+	resp, err := rpc.UserClient.Login(h.Context, &user.LoginReq{Email: req.Email, Password: req.Password})
+	session := sessions.Default(h.RequestContext)
+	session.Set("user_id", resp.UserId)
+	err = session.Save()
+	if err != nil {
+		return "/sign-in", err
+	}
+	if req.Next != "" {
+		redirect = req.Next
+	} else {
+		redirect = "/"
+	}
+
 	return
 }
