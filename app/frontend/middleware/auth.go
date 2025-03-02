@@ -5,15 +5,15 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/sessions"
+	"github.com/hltl/GoMall/gomall/app/frontend/utils"
 )
 
-type SessionUserIdKey string
-const SessionUserId SessionUserIdKey = "user_id"
+
 
 func GlobalAuth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		s:=sessions.Default(c)
-		ctx= context.WithValue(ctx,SessionUserId,s.Get("user_id"))
+		ctx= context.WithValue(ctx,utils.SessionUserId,s.Get("user_id"))
 		c.Next(ctx)
 	}
 }
