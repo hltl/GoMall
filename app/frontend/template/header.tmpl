@@ -63,8 +63,8 @@
                                     Categories
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">T-shirt</a></li>
-                                    <li><a class="dropdown-item" href="#">Sticker</a></li>
+                                    <li><a class="dropdown-item" href="/category/t-shirt">T-shirt</a></li>
+                                    <li><a class="dropdown-item" href="/category/sticker">Sticker</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
@@ -74,9 +74,9 @@
                         </ul>
                         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                             <li class="nav-item d-flex">
-                                <form class="d-flex" role="search">
+                                <form class="d-flex" role="search" action="/search" method="get">
                                     <input class="form-control me-2" type="search" placeholder="Search"
-                                        aria-label="Search">
+                                        aria-label="Search" value="{{ .query }}" name="q">
                                     <button class="btn btn-outline-success me-2" type="submit">Search</button>
                                 </form>
                             </li>
@@ -103,6 +103,15 @@
                 </div>
             </div>
         </nav>
+        {{ if .error }}
+        <div class="alert alert-danger text-center" role="alert">{{ .error }}</div>
+        {{ end }}
+        {{ if .warning }}
+        <div class="alert alert-warning text-center" role="alert">{{ .warning }}</div>
+        {{ end }}
     </header>
+    <main role="main" class="home pt-5" style="min-height:calc(100vh - 212px);">
+        <div class="container">
+            <h1 class="text-center">{{ $.title }}</h1>
 
-    {{end}}
+{{end}}

@@ -5,7 +5,10 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	common "github.com/hltl/GoMall/gomall/app/frontend/hertz_gen/frontend/common"
+	"github.com/hltl/GoMall/gomall/app/frontend/infra/rpc"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/product"
 )
 
 type HomeService struct {
@@ -23,17 +26,12 @@ func (h *HomeService) Run(req *common.Empty) (resp map[string]any, err error) {
 	hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
 
-	resp = make(map[string]any)
-	resp["Title"]="Home"
-	items := []map[string]any{
-		{"Name":"test1","Price":100,"Picture":"/static/image/test1.jpg"},
-		{"Name":"test2","Price":200,"Picture":"/static/image/test1.jpg"},
-		{"Name":"test3","Price":300,"Picture":"/static/image/test1.jpg"},
-		{"Name":"test1","Price":100,"Picture":"/static/image/test1.jpg"},
-		{"Name":"test2","Price":200,"Picture":"/static/image/test1.jpg"},
-		{"Name":"test3","Price":300,"Picture":"/static/image/test1.jpg"},
+	p,err:=rpc.ProductClient.ListProducts(h.Context,&product.ListProductsReq{})
+	if err!=nil{
+		return nil,err
 	}
-	resp["Items"]=items
-	// todo edit your code
-	return resp, nil
+	return utils.H{
+		"title":"Hot sale",
+		"items":p.Products,
+	},nil
 }
