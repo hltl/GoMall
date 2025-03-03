@@ -48,5 +48,5 @@ func GetCart(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	c.HTML(consts.StatusOK, "cart", resp)
+	c.HTML(consts.StatusOK, "cart",utils.WrapResponse(ctx,c,resp))
 }

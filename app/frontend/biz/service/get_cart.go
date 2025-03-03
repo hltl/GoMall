@@ -49,14 +49,15 @@ func (h *GetCartService) Run(req *common.Empty) (resp map[string]any, err error)
 		items[i]=map[string]string{
 			"Name":v.Name,
 			"Description":v.Description,
+			"Picture":v.Picture,
 			"Price":strconv.FormatFloat(float64(v.Price), 'f', 2, 64),
-			"Quantity":strconv.Itoa(int(p.Cart.Items[i].Quantity)),
+			"Qty":strconv.Itoa(int(p.Cart.Items[i].Quantity)),
 		}
 		total+=float64(v.Price)*float64(p.Cart.Items[i].Quantity)
 	}
 	return utils.H{
 		"title": "Cart",
 		"items": items,
-		"total": total,
+		"total": strconv.FormatFloat(float64(total), 'f', 2, 64),
 	},nil
 }

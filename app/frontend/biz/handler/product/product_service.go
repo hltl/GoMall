@@ -47,5 +47,5 @@ func SearchProducs(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	c.HTML(consts.StatusOK,"search",resp)
+	c.HTML(consts.StatusOK,"search",utils.WrapResponse(ctx,c,resp))
 }
