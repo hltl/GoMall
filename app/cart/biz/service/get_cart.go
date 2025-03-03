@@ -26,10 +26,10 @@ func (s *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err 
 	if err != nil{
 		return nil, err
 	}
-	resp = &cart.GetCartResp{}
+	resp = &cart.GetCartResp{Cart: &cart.Cart{}}
 	resp.Cart.UserId = req.UserId
 	for _, v:=range r{
 		resp.Cart.Items=append(resp.Cart.Items, &cart.CartItem{ProductId: uint32(v.ProductId),Quantity: int32(v.Quantity)})
 	}
-	return
+	return resp,nil
 }

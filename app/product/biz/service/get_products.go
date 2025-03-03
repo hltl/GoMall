@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/hltl/GoMall/app/order/biz/dal/mysql"
+	"github.com/hltl/GoMall/app/product/biz/dal/mysql"
 	"github.com/hltl/GoMall/app/product/biz/model"
 	product "github.com/hltl/GoMall/rpc_gen/kitex_gen/product"
 )
@@ -20,7 +20,7 @@ func (s *GetProductsService) Run(req *product.GetProductsReq) (resp *product.Get
 	// Finish your business logic.
 	// Example implementation: return products for even IDs and record odd IDs as failures.
 	var failedIds []uint32
-	products := make([]*product.Product, len(req.Ids))
+	products := make([]*product.Product, 0, len(req.Ids))
 	// Assume req.ProductIds contains the list of product IDs.
 	for _, id := range req.Ids {
 		p,err:= model.GetProductById(s.ctx,mysql.DB,uint(id))

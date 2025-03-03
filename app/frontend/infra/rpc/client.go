@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/transport"
 	"github.com/hltl/GoMall/gomall/app/frontend/conf"
 	"github.com/hltl/GoMall/gomall/app/frontend/utils"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/cart/cartservice"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/product/productcatalogservice"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/user/userservice"
 	consul "github.com/kitex-contrib/registry-consul"
@@ -17,6 +18,7 @@ import (
 var (
 	UserClient userservice.Client
 	ProductClient productcatalogservice.Client
+	CartClient cartservice.Client
 	once       sync.Once
 )
 
@@ -24,6 +26,7 @@ func InitClient() {
 	once.Do(func() {
 		initUserClient()
 		initProductClinet()
+		initCartClinet()
 	})
 }
 
@@ -41,6 +44,16 @@ func initProductClinet(){
 	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
 	utils.MustHandleError(err)
 	ProductClient, err = productcatalogservice.NewClient("product", client.WithResolver(r),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
+		client.WithTransportProtocol(transport.GRPC),
+		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
+	utils.MustHandleError(err)
+}
+
+func initCartClinet(){
+	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
+	utils.MustHandleError(err)
+	CartClient, err = cartservice.NewClient("cart", client.WithResolver(r),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
 		client.WithTransportProtocol(transport.GRPC),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
