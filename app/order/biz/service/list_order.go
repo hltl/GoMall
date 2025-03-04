@@ -7,6 +7,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/hltl/GoMall/app/order/biz/dal/mysql"
 	"github.com/hltl/GoMall/app/order/biz/model"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/cart"
 	order "github.com/hltl/GoMall/rpc_gen/kitex_gen/order"
 )
 
@@ -30,7 +31,18 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 	}
 	resp = &order.ListOrderResp{}
 	for _, v := range orders {
+		items := make([]*order.OrderItem, 0)
+		for _, it := range v.Items {
+			items = append(items, &order.OrderItem{
+				Cost: it.Cost,
+				Item: &cart.CartItem{
+					ProductId: it.ProductID,
+					Quantity:  it.Quantity,
+				},
+			})
+		}
 		resp.Orders = append(resp.Orders, &order.Order{
+			CreatedAt:    int32(v.CreatedAt.Unix()),
 			OrderId:      v.OrderID,
 			UserId:       v.UserID,
 			UserCurrency: v.UserCurrency,
@@ -42,6 +54,7 @@ func (s *ListOrderService) Run(req *order.ListOrderReq) (resp *order.ListOrderRe
 				Country:       v.Consignee.Country,
 				ZipCode:       v.Consignee.ZipCode,
 			},
+			OrderItems: items,
 		})
 	}
 	return

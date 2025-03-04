@@ -11,6 +11,7 @@ import (
 	"github.com/hltl/GoMall/gomall/app/frontend/utils"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/cart/cartservice"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/checkout/checkoutservice"
+	"github.com/hltl/GoMall/rpc_gen/kitex_gen/order/orderservice"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/product/productcatalogservice"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/user/userservice"
 	consul "github.com/kitex-contrib/registry-consul"
@@ -21,6 +22,7 @@ var (
 	ProductClient productcatalogservice.Client
 	CartClient cartservice.Client
 	CheckoutClient checkoutservice.Client
+	OrderClient orderservice.Client
 	once       sync.Once
 )
 
@@ -30,6 +32,7 @@ func InitClient() {
 		initProductClinet()
 		initCartClinet()
 		initCheckoutClinet()
+		initOrderClinet()
 	})
 }
 
@@ -67,6 +70,16 @@ func initCheckoutClinet(){
 	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
 	utils.MustHandleError(err)
 	CheckoutClient, err = checkoutservice.NewClient("checkout", client.WithResolver(r),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
+		client.WithTransportProtocol(transport.GRPC),
+		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
+	utils.MustHandleError(err)
+}
+
+func initOrderClinet(){
+	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
+	utils.MustHandleError(err)
+	OrderClient, err = orderservice.NewClient("order", client.WithResolver(r),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Hertz.Service}),
 		client.WithTransportProtocol(transport.GRPC),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
