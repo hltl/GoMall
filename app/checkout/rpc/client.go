@@ -95,7 +95,7 @@ func initOrderClient() {
 		client.WithTransportProtocol((transport.GRPC)),
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler))
 
-	PaymentClient, err = paymentservice.NewClient("order", opts...)
+	OrderClient, err = orderservice.NewClient("order", opts...)
 	if err != nil {
 		panic(err)
 	}

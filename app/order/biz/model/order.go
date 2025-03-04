@@ -24,12 +24,12 @@ const (
 
 type Order struct {
 	gorm.Model
-	OrderID      string      `json:"orderId" gorm:"type:varchar(100);unique_index"`
+	OrderID      string      `json:"orderId" gorm:"uniqueIndex;size:256"`
 	UserID       uint32      `json:"userId"`
 	UserCurrency string      `json:"userCurrency"`
 	Email        string      `json:"email"`
 	Consignee    Consignee   `json:"consignee" gorm:"embedded"`
-	Items        []OrderItem `json:"items"`
+	Items        []OrderItem `json:"items" gorm:"foreignKey:OrderID;references:OrderID"`
 	Status       OrderStatus `json:"status"`
 }
 

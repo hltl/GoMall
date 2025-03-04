@@ -49,11 +49,11 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		price[p.Id] = p.Price
 	}
 	var total float32
-	orderItem := make([]*order.OrderItem, len(productsResp.Products))
+	orderItem := make([]*order.OrderItem,0)
 	for _, item := range cartResp.Cart.Items {
 		cost := price[item.ProductId] * float32(item.Quantity)
 		total += cost
-		orderItem = append(orderItem, &order.OrderItem{Item: item, Cost: cost})
+		orderItem =append(orderItem, &order.OrderItem{Item: item, Cost: cost})
 	}
 
 	// 创建订单

@@ -20,54 +20,72 @@ func NewPlaceOrderService(ctx context.Context) *PlaceOrderService {
 
 // Run create note info
 func (s *PlaceOrderService) Run(req *order.PlaceOrderReq) (resp *order.PlaceOrderResp, err error) {
-	// Finish your business logic.
-	if len(req.OrderItems) == 0 {
-		return nil, kerrors.NewGRPCBizStatusError(6004001, "order items is required")
-	}
-	err = mysql.DB.WithContext(s.ctx).Transaction(func(tx *gorm.DB) error {
-		// Create order
-		// Create order items
-		orderId, _ := uuid.NewUUID()
-		o := &model.Order{
-			OrderID:      orderId.String(),
-			UserID:       req.UserId,
-			UserCurrency: req.UserCurrency,
-			Email:        req.Email,
-			Consignee: model.Consignee{
-				Email: req.Email,
-			},
-			Status: model.OrderStatusPending,
-		}
-		if req.Address != nil {
-			a := req.Address
-			o.Consignee.City = a.City
-			o.Consignee.Country = a.Country
-			o.Consignee.State = a.State
-			o.Consignee.Street = a.StreetAddress
-		}
-		if err := tx.Create(&o).Error; err != nil {
-			return err
-		}
-		items := make([]model.OrderItem, len(req.OrderItems))
-		for _, oi := range req.OrderItems {
-			items = append(items, model.OrderItem{
-				ProductID: oi.Item.ProductId,
-				OrderID:   orderId.String(),
-				Quantity:  oi.Item.Quantity,
-				Cost:      oi.Cost,
-			})
-		}
+    if len(req.OrderItems) == 0 {
+        return nil, kerrors.NewGRPCBizStatusError(6004001, "order items is required")
+    }
 
-		if err := tx.Create(&items).Error; err != nil {
-			return err
-		}
+    err = mysql.DB.WithContext(s.ctx).Transaction(func(tx *gorm.DB) error {
+        // 创建订单
+        orderId, err := uuid.NewUUID()
+        if err != nil {
+            return kerrors.NewGRPCBizStatusError(6004002, "generate order id failed")
+        }
 
-		resp = &order.PlaceOrderResp{
-			Order: &order.OrderResult{
-				OrderId: orderId.String(),
-			},
-		}
-		return nil
-	})
-	return
+        o := &model.Order{
+            OrderID:      orderId.String(),
+            UserID:       req.UserId,
+            UserCurrency: req.UserCurrency,
+            Email:        req.Email,
+            Consignee: model.Consignee{
+                Email: req.Email,
+            },
+            Status: model.OrderStatusPending,
+        }
+
+        // 处理地址信息
+        if req.Address != nil {
+            o.Consignee.City = req.Address.City
+            o.Consignee.Country = req.Address.Country
+            o.Consignee.State = req.Address.State
+            o.Consignee.Street = req.Address.StreetAddress
+        }
+
+        // 创建订单记录
+        if err := tx.Create(o).Error; err != nil {
+            return kerrors.NewGRPCBizStatusError(6004003, "create order failed")
+        }
+
+        // 创建订单项
+        items := make([]model.OrderItem, 0, len(req.OrderItems))
+        for _, oi := range req.OrderItems {
+            if oi.Item == nil {
+                return kerrors.NewGRPCBizStatusError(6004004, "invalid order item")
+            }
+            items = append(items, model.OrderItem{
+                ProductID: oi.Item.ProductId,
+                OrderID:   orderId.String(),
+                Quantity:  oi.Item.Quantity,
+                Cost:      oi.Cost,
+            })
+        }
+
+        // 批量创建订单项
+        if len(items) > 0 {
+            if err := tx.Create(&items).Error; err != nil {
+                return kerrors.NewGRPCBizStatusError(6004005, err.Error())
+            }
+        }
+
+        resp = &order.PlaceOrderResp{
+            Order: &order.OrderResult{
+                OrderId: orderId.String(),
+            },
+        }
+        return nil
+    })
+
+    if err != nil {
+        return nil, err
+    }
+    return resp, nil
 }
