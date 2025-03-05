@@ -25,7 +25,7 @@ func NewGetCartService(Context context.Context, RequestContext *app.RequestConte
 
 func (h *GetCartService) Run(req *common.Empty) (resp map[string]any, err error) {
 	defer func() {
-	hlog.CtxInfof(h.Context, "req = %+v", req)
+	hlog.CtxInfof(h.Context, "getCart req = %+v", req)
 	hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
 	// todo edit your code
@@ -34,7 +34,6 @@ func (h *GetCartService) Run(req *common.Empty) (resp map[string]any, err error)
 		hlog.Error(h.Context, "GetCart failed", uint32(frontendutils.GetUserIdFromCtx(h.Context)))
 		return nil,err
 	}
-
 	ids:=make([]uint32,len(p.Cart.Items))
 	for i,v:=range p.Cart.Items{
 		ids[i]=v.ProductId

@@ -22,7 +22,7 @@ func NewGetProductService(Context context.Context, RequestContext *app.RequestCo
 
 func (h *GetProductService) Run(req *product.ProductReq) (resp map[string]any, err error) {
 	defer func() {
-		hlog.CtxInfof(h.Context, "req = %+v", req)
+		hlog.CtxInfof(h.Context, "getProduct req = %+v", req)
 		hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
 	// todo edit your code

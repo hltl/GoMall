@@ -33,6 +33,7 @@ func (h *LoginService) Run(req *auth.LoginRequest) (redirect string, err error) 
 	}
 	session := sessions.Default(h.RequestContext)
 	session.Set("user_id", resp.UserId)
+	session.Set("token", resp.Token)
 	err = session.Save()
 	if err != nil {
 		redirect = "/sign-in"

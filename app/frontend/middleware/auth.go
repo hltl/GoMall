@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/sessions"
-	"github.com/hltl/GoMall/app/user/infra/rpc"
+	"github.com/hltl/GoMall/gomall/app/frontend/infra/rpc"
 	"github.com/hltl/GoMall/gomall/app/frontend/utils"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/auth"
 )
@@ -29,7 +29,7 @@ func Auth() app.HandlerFunc {
 			return
 		}
 		valid, err := rpc.AuthClient.VerifyTokenByRPC(ctx, &auth.VerifyTokenReq{
-			UserId: uint32(userId.(int)),
+			UserId: uint32(userId.(int32)),
 			Token:  token.(string),
 		})
 		if err != nil || !valid.Res {

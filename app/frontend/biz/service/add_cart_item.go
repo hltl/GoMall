@@ -23,7 +23,7 @@ func NewAddCartItemService(Context context.Context, RequestContext *app.RequestC
 
 func (h *AddCartItemService) Run(req *cart.AddCartReq) (resp *common.Empty, err error) {
 	defer func() {
-		hlog.CtxInfof(h.Context, "req = %+v", req)
+		hlog.CtxInfof(h.Context, "AddItem req = %+v", req)
 		hlog.CtxInfof(h.Context, "resp = %+v", resp)
 	}()
 	// todo edit your code

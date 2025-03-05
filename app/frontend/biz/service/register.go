@@ -33,6 +33,7 @@ func (h *RegisterService) Run(req *auth.RegisterRequest) (redirect string, err e
 	}
 	session := sessions.Default(h.RequestContext)
 	session.Set("user_id", resp.UserId)
+	session.Set("token", resp.Token)
 	err=session.Save()
 
 	if err != nil {
