@@ -17,7 +17,7 @@ services=(
 for service in "${services[@]}"
 do
     # 使用更精确的匹配方式查找进程
-    pid=$(pgrep -f "${service}")
+    pid=$(pgrep -f "exe/${service}")
     
     if [ -n "$pid" ]; then
         echo "Found ${service} service with PID: $pid"

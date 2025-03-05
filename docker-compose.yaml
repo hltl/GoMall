@@ -15,6 +15,7 @@ services:
     image: 'hashicorp/consul'
     ports:
       - 8500:8500
+# 内外穿透服务，映射本地8080端口
   ngrok:
     image: 'ngrok/ngrok:latest'
     environment:
