@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/hltl/GoMall/app/user/biz/dal"
 	"github.com/hltl/GoMall/app/user/conf"
+	"github.com/hltl/GoMall/app/user/infra/rpc"
 	"github.com/hltl/GoMall/rpc_gen/kitex_gen/user/userservice"
 	"github.com/joho/godotenv"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
@@ -20,6 +21,7 @@ import (
 func main() {
 	_ = godotenv.Load()
 	dal.Init()
+	rpc.InitClient()
 	opts := kitexInit()
 
 	svr := userservice.NewServer(new(UserServiceImpl), opts...)

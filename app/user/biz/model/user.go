@@ -27,3 +27,7 @@ func GetUserByEmail(ctx context.Context,db *gorm.DB, email string) (*User, error
 func CreateUser(ctx context.Context,db *gorm.DB, user *User) error {
 	return db.Create(user).Error
 }
+
+func DeleteUser(ctx context.Context,db *gorm.DB, id uint) error {
+	return db.Delete(&User{}, id).Error
+}

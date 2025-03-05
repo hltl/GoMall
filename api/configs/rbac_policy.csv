@@ -1,4 +1,0 @@
-p, admin, /api/*, *
-p, user, /api/user/*, GET
-p, user, /api/user/*, POST
-g, alice, admin 
